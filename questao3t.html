@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>tricube.js app</title>
+		<style>
+			body { margin: 0; }
+		</style>
+	</head>
+	<body>
+		<script src="js/three.js"></script>
+		<script>
+		const scene = new THREE.Scene();
+		const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+		
+		const renderer = new THREE.WebGLRenderer();
+		renderer.setSize( window.innerWidth, window.innerHeight );
+		document.body.appendChild( renderer.domElement );
+
+		const geometry1 = new THREE.BoxGeometry(2, 2, 2);
+		const material1 = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
+		const cube1 = new THREE.Mesh( geometry1, material1 );
+		scene.add( cube1 );
+        cube1.position.x=0;
+
+		const geometry2 = new THREE.BoxGeometry(2, 2, 2);
+		const material2 = new THREE.MeshLambertMaterial( { color: 0x3f8c99 , emissive: 0x2a2a2a } );
+		const cube2 = new THREE.Mesh( geometry2, material2 );
+		scene.add( cube2 );
+        cube2.position.x=3;
+
+		const geometry3 = new THREE.BoxGeometry(2, 2, 2);
+		const material3 = new THREE.MeshPhongMaterial( { color: 0xff0000 , emissive: 0x404040, specular: 0xcc4e4e} );
+		const cube3 = new THREE.Mesh( geometry3, material3 );
+		scene.add( cube3 );
+        cube3.position.x=-3;
+        
+        const light = new THREE.AmbientLight( 0x404040 );
+        scene.add(light);
+        
+		camera.position.z = 7;
+			
+		renderer.render(scene, camera);
+
+            
+		</script>
+	</body>
+</html>

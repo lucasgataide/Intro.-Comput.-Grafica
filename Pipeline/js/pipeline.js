@@ -165,11 +165,8 @@ let cam_up = new THREE.Vector3(0.0, 1.0, 0.0); // vetor Up da câmera.
 
 let direction_cam = new THREE.Vector3(); // vetor de direção da camêra
 
-direction_cam = cam_look_at; // copia o ponto para aonde a camera aponta
+direction_cam = cam_look_at.clone(); // copia o ponto para aonde a camera aponta
 direction_cam = direction_cam.sub(cam_pos); //subtrai a posição desse ponto
-
-console.log('vetor direcao');
-console.log(direction_cam);
 
 let z_base_cam = new THREE.Vector3();
 
@@ -179,22 +176,16 @@ z_base_cam = z_base_cam.negate(); // inverte
 
 let x_base_cam = new THREE.Vector3();
 
-x_base_cam = cam_up; // copia cam_up para x_base
+x_base_cam = cam_up.clone(); // copia cam_up para x_base
 x_base_cam = x_base_cam.cross(z_base_cam); // faz o produto vetorial do up com o o vetor z da base
 x_base_cam = x_base_cam.normalize(); // faz a norma do vetor
 
 let y_base_cam = new THREE.Vector3();
 
-y_base_cam = x_base_cam; // copia o vetor x da base
+y_base_cam = x_base_cam.clone(); // copia o vetor x da base
 y_base_cam = y_base_cam.cross(z_base_cam); // faz o produto vetorial do vetor x com o vetor z
 y_base_cam = y_base_cam.normalize(); // faz a norma, mas n é necessário pq o produto vetorial foi feito com 2 vetores unitarios
-
-console.log('vetor base x');
-console.log(x_base_cam);
-console.log('vetor base y');
-console.log(y_base_cam);
-console.log('vetor base z');
-console.log(z_base_cam);
+y_base_cam = y_base_cam.negate();
 
 // Construir 'm_bt', a inversa da matriz de base da câmera.
 
@@ -217,15 +208,10 @@ let vetor_translacao = new THREE.Vector3();
 vetor_translacao = cam_pos; // vetro translacao para ser feita a matriz de translacao
 vetor_translacao = vetor_translacao.sub(origem); // Vt = coordenada inicial - coordenada destino, no nosso caso a origem
 
-console.log('vetor translacao');
-console.log(vetor_translacao);
 
 let m_t = new THREE.Matrix4();
 // funcao que gera matriz de translacao implementada anteriormente
 m_t = translateMatriz(-vetor_translacao.x, -vetor_translacao.y, -vetor_translacao.z);
-
-console.log('matriz translacao');
-console.log(m_t);
 
 // Constrói a matriz de visualização 'm_view' como o produto
 //  de 'm_bt' e 'm_t'.
@@ -247,10 +233,7 @@ let d = 1.0 // disteancia até o near plane, dado pelo problema
 m_projection.set(1.0, 0.0, 0.0, 0.0, //matriz de projeção dada pelo problema
     0.0, 1.0, 0.0, 0.0,
     0.0, 0.0, 1.0, d,
-    0.0, 0.0, -(1 / d), 1.0);
-
-console.log('m projecao')
-console.log(m_projection);
+    0.0, 0.0, -(1.0 / d), 1.0);
 
 for (let i = 0; i < 8; ++i)
     vertices[i].applyMatrix4(m_projection);
@@ -267,6 +250,7 @@ let coord_homogenea;
 
 for (let i = 0; i < 8; ++i) {
     coord_homogenea = vertices[i].w;
+    console.log(coord_homogenea);
     vertices[i].divideScalar(coord_homogenea);
 }
 /******************************************************************************
@@ -288,8 +272,13 @@ let height = 128;
 let matriz_Escala = new THREE.Matrix4();
 let matriz_Translacao = new THREE.Matrix4();
 
-matriz_Escala = ScaleMatriz(width / 2, height / 2, 1.0);
-matriz_Translacao = TRanslateMatriz()
+matriz_Escala = scaleMatriz(width / 2, height / 2, 1.0); //escala a matriz proporcionalmente com a resolucao
+
+matriz_Translacao = translateMatriz(1.0, 1.0, 0.0);
+// translada a matriz 1 posicao para não ter pontos negativos devido ao espaco canonico ir de -1 a 1
+
+m_viewport = m_viewport.multiply(matriz_Escala);
+m_viewport = m_viewport.multiply(matriz_Translacao);
 
 
 for (let i = 0; i < 8; ++i)
@@ -301,4 +290,7 @@ for (let i = 0; i < 8; ++i)
 
 // ---------- implementar aqui ----------------------------------------------
 
-color_buffer.putPixel(vertices[6].x, vertices[6].y, [255, 0, 0]);
+color = [255, 0, 0, 0];
+for (let i = 0; i < edges.length; ++i) {
+    MidPointLineAlgorithm(vertices[edges[i][0]].x, vertices[edges[i][0]].y, vertices[edges[i][1]].x, vertices[edges[i][1]].y, color, color);
+}

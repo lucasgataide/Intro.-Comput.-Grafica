@@ -135,6 +135,9 @@ function rotateMatriz(eixo, angulo) {
 
 }
 
+// como a matriz de modelagem solicitada é igual a identidade,
+// não foi aplicada nenhuma transformação
+
 for (let i = 0; i < 8; ++i)
     vertices[i].applyMatrix4(m_model);
 
@@ -218,7 +221,7 @@ console.log('vetor translacao');
 console.log(vetor_translacao);
 
 let m_t = new THREE.Matrix4();
-
+// funcao que gera matriz de translacao implementada anteriormente
 m_t = translateMatriz(-vetor_translacao.x, -vetor_translacao.y, -vetor_translacao.z);
 
 console.log('matriz translacao');
@@ -239,10 +242,15 @@ for (let i = 0; i < 8; ++i)
 // ---------- implementar aqui ----------------------------------------------
 let m_projection = new THREE.Matrix4();
 
-m_projection.set(1.0, 0.0, 0.0, 0.0,
+let d = 1.0 // disteancia até o near plane, dado pelo problema
+
+m_projection.set(1.0, 0.0, 0.0, 0.0, //matriz de projeção dada pelo problema
     0.0, 1.0, 0.0, 0.0,
-    0.0, 0.0, 1.0, 0.0,
-    0.0, 0.0, 0.0, 1.0);
+    0.0, 0.0, 1.0, d,
+    0.0, 0.0, -(1 / d), 1.0);
+
+console.log('m projecao')
+console.log(m_projection);
 
 for (let i = 0; i < 8; ++i)
     vertices[i].applyMatrix4(m_projection);
@@ -252,7 +260,15 @@ for (let i = 0; i < 8; ++i)
  *****************************************************************************/
 
 // ---------- implementar aqui ----------------------------------------------
+// para passar para o espaço canonico, as coordenadas vão ser dividididas pela homogenea,
+//gerando noção de profundidade
 
+let coord_homogenea;
+
+for (let i = 0; i < 8; ++i) {
+    coord_homogenea = vertices[i].w;
+    vertices[i].divideScalar(coord_homogenea);
+}
 /******************************************************************************
  * Matriz Viewport: Esp. Canônico --> Esp. Tela
  * OBS: A matriz está carregada inicialmente com a identidade. 
@@ -265,6 +281,16 @@ m_viewport.set(1.0, 0.0, 0.0, 0.0,
     0.0, 1.0, 0.0, 0.0,
     0.0, 0.0, 1.0, 0.0,
     0.0, 0.0, 0.0, 1.0);
+
+let width = 128;
+let height = 128;
+
+let matriz_Escala = new THREE.Matrix4();
+let matriz_Translacao = new THREE.Matrix4();
+
+matriz_Escala = ScaleMatriz(width / 2, height / 2, 1.0);
+matriz_Translacao = TRanslateMatriz()
+
 
 for (let i = 0; i < 8; ++i)
     vertices[i].applyMatrix4(m_viewport);
